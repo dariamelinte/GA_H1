@@ -62,15 +62,6 @@ void hillclimbing(std::vector<double> vect) {
 //     rvalues.push_back(bestMinimum);
 // }
 
-double de_jong_function (std::vector<double> x) {
-  int dimension = x.size();
-  double f_x = 0;
-  for (int facet = 0; facet < dimension; facet++) {
-    f_x += x[facet] * x[facet];
-  }
-  return f_x;
-}
-
 double schwefels_function (std::vector<double> x) {
   int dimension = x.size();
   double f_x = 0;
@@ -87,17 +78,6 @@ double rastrigins_function (std::vector<double> x) {
     f_x += x[facet] * x[facet] - 10 * cos(2 * M_PI * x[facet]);
   }
   return f_x;
-}
-
-void print_de_jong_function_result (std::vector<double> vect) {
-  std::cout << "De Jong ---- v ( ";
-  for (double x : vect) {
-    std::cout << x << " ";
-  }
-
-  std::cout << ") = " << de_jong_function(vect) << std::endl;
-
-  hillclimbing(vect);
 }
 
 void print_schwefels_function_result (std::vector<double> vect) {
@@ -135,15 +115,6 @@ std::vector<double> generate_vector (int dimenstion, double high, double low) {
   }
 
   return vect;
-}
-
-void run_de_jong (int n) {
-  for (int i = 0; i < n; i++) {
-    std::cout << i << " --> ";
-    std::vector<double> vect = generate_vector(4, -5.12, 5.12);
-    print_de_jong_function_result(vect);
-    std::cout << std::endl;
-  }
 }
 
 void run_schwefels (int n) {
