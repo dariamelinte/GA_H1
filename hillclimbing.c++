@@ -10,8 +10,13 @@
 
 std::mt19937 random_gen(time(0));
 
-double low = -5.12;
-double high = 5.12;
+
+// de jong: -5.12; 5.12;  minimum point = 0
+// schwefels: -500; 500;  minimum point = - number_of_dimensions * 418.9829;
+
+
+double low = -500;
+double high = 500;
 double interval = high - low;
 
 
@@ -23,12 +28,22 @@ int bit_string_len = ceil(log2(pow(10, precision) * interval)); //lungimea unui 
 int len = number_of_dimensions * bit_string_len; //calculeaza lungimea unui sir de biti pe un anumit numar de dimensiuni 'dimensions'
 
 double lowest_double = std::numeric_limits<double>::lowest();
+double highest_double = std::numeric_limits<double>::max();
 
 double de_jong_function (std::vector<double> x) {
   int dimension = x.size();
   double f_x = 0;
   for (int facet = 0; facet < dimension; facet++) {
     f_x += x[facet] * x[facet];
+  }
+  return f_x;
+}
+
+double schwefels_function (std::vector<double> x) {
+  int dimension = x.size();
+  double f_x = 0;
+  for (int facet = 0; facet < dimension; facet++) {
+    f_x -= x[facet] * sin(sqrt(abs(x[facet])));
   }
   return f_x;
 }
@@ -112,18 +127,18 @@ std::vector<double> convert_bit_string_to_b10_vector(std::vector<bool> bit_strin
 
 void first_improvement(std::vector<bool>& bit_string) {
   std::vector<double> b10_vector = convert_bit_string_to_b10_vector(bit_string);
-  double de_jong_result = de_jong_function(b10_vector);
+  // double de_jong_result = de_jong_function(b10_vector);
+  double schwefels_result = schwefels_function(b10_vector);
 
   for (int index = 0; index < len; index++) {
     bit_string[index] = !bit_string[index];
 
     std::vector<double> new_b10_vector = convert_bit_string_to_b10_vector(bit_string);
-    double new_de_jong_result = de_jong_function(new_b10_vector);
+    // double new_de_jong_result = de_jong_function(new_b10_vector);
+    double new_schwefels_result = schwefels_function(new_b10_vector);
 
-    if (new_de_jong_result < de_jong_result) {
-      std::cout << "found better restult" << std::endl;
-      std::cout << "old result: " << de_jong_result << std::endl;
-      std::cout << "new result: " << new_de_jong_result << std::endl << std::endl;
+    // if (new_de_jong_result < de_jong_result) {
+    if (new_schwefels_result < schwefels_result) {
       return;
     }
 
@@ -134,7 +149,8 @@ void first_improvement(std::vector<bool>& bit_string) {
 
 void best_improvement(std::vector<bool>& bit_string) {
   std::vector<double> b10_vector = convert_bit_string_to_b10_vector(bit_string);
-  double de_jong_result = de_jong_function(b10_vector);
+  // double de_jong_result = de_jong_function(b10_vector);
+  double schwefels_result = schwefels_function(b10_vector);
 
   int best_index = -1;
 
@@ -142,13 +158,13 @@ void best_improvement(std::vector<bool>& bit_string) {
     bit_string[index] = !bit_string[index];
 
     std::vector<double> new_b10_vector = convert_bit_string_to_b10_vector(bit_string);
-    double new_de_jong_result = de_jong_function(new_b10_vector);
+    // double new_de_jong_result = de_jong_function(new_b10_vector);
+    double new_schwefels_result = schwefels_function(new_b10_vector);
 
-    if (new_de_jong_result < de_jong_result) {
-      std::cout << "found better restult" << std::endl;
-      std::cout << "old result: " << de_jong_result << std::endl;
-      std::cout << "new result: " << new_de_jong_result << std::endl << std::endl;
-      de_jong_result = new_de_jong_result;
+    // if (new_de_jong_result < de_jong_result) {
+    if (new_schwefels_result < schwefels_result) {
+      // de_jong_result = new_de_jong_result;
+      schwefels_result = new_schwefels_result;
       best_index = index;
     }
 
@@ -162,7 +178,8 @@ void best_improvement(std::vector<bool>& bit_string) {
 
 void worst_improvement(std::vector<bool>& bit_string) {
   std::vector<double> b10_vector = convert_bit_string_to_b10_vector(bit_string);
-  double de_jong_result = de_jong_function(b10_vector);
+  // double de_jong_result = de_jong_function(b10_vector);
+  double schwefels_result = schwefels_function(b10_vector);
 
   double lowest = lowest_double;
   int best_index = -1;
@@ -171,13 +188,13 @@ void worst_improvement(std::vector<bool>& bit_string) {
     bit_string[index] = !bit_string[index];
 
     std::vector<double> new_b10_vector = convert_bit_string_to_b10_vector(bit_string);
-    double new_de_jong_result = de_jong_function(new_b10_vector);
+    // double new_de_jong_result = de_jong_function(new_b10_vector);
+    double new_schwefels_result = schwefels_function(new_b10_vector);
 
-    if (new_de_jong_result < de_jong_result && new_de_jong_result > lowest) {
-      std::cout << "found better restult" << std::endl;
-      std::cout << "old result: " << de_jong_result << std::endl;
-      std::cout << "new result: " << new_de_jong_result << std::endl << std::endl;
-      lowest = new_de_jong_result;
+    // if (new_de_jong_result < de_jong_result && new_de_jong_result > lowest) {
+    if (new_schwefels_result < schwefels_result && new_schwefels_result > lowest) {
+      // lowest = new_de_jong_result;
+      lowest = new_schwefels_result;
       best_index = index;
     }
 
@@ -189,20 +206,61 @@ void worst_improvement(std::vector<bool>& bit_string) {
   }
 }
 
+void hillclimbing() {
+  double best_number = highest_double;
+
+  for (int t = 0; t < 1000; t++) {
+    bool local = false;
+
+    std::vector<bool> candidate_bit_string = generate_bit_string(low, high);
+    std::vector<double> candidate_b10_vector = convert_bit_string_to_b10_vector(candidate_bit_string);
+    // double candidate_result = de_jong_function(candidate_b10_vector);
+    double candidate_result = schwefels_function(candidate_b10_vector);
+
+    do {
+      std::vector<bool> nbh_bit_string = candidate_bit_string;
+      best_improvement(nbh_bit_string);
+
+      std::vector<double> nbh_b10_vector = convert_bit_string_to_b10_vector(nbh_bit_string);
+      // double nbh_result = de_jong_function(nbh_b10_vector);
+      double nbh_result = schwefels_function(nbh_b10_vector);
+
+      if (nbh_result < candidate_result) {
+        candidate_result = nbh_result;
+        candidate_bit_string = nbh_bit_string;
+      } else {
+        local = true;
+      }
+    } while (!local);
+
+    if (candidate_result <  best_number) {
+      best_number = candidate_result;
+    }
+
+    std::cout << "current best number ----------------------- " << best_number << std::endl << std::endl;
+  }
+
+  std::cout << "hillclimber result ----------------------- " << best_number << std::endl << std::endl;
+}
+
 int main () {
   srand(time(0));
 
+  std::cout << std::setprecision(precision) << std::fixed;
+
   auto start = std::chrono::high_resolution_clock::now();
 
-  for (int i = 0; i < 3; i++) {
-    std::cout << i << " ----------- ";
-    std::vector<bool> bit_string = generate_bit_string(-5.12, 5.12);
+  hillclimbing();
 
-    for (bool element : bit_string) {
-      std::cout << element << " ";
-    }
+  // for (int i = 0; i < 3; i++) {
+  //   std::cout << i << " ----------- ";
+  //   std::vector<bool> bit_string = generate_bit_string(-5.12, 5.12);
 
-    std::cout << std::endl << std::endl;
+  //   for (bool element : bit_string) {
+  //     std::cout << element << " ";
+  //   }
+
+  //   std::cout << std::endl << std::endl;
 
     // b10_conversion_info info = convert_b2_to_b10(bit_string);
 
@@ -217,14 +275,14 @@ int main () {
 
     // first_improvement(bit_string);
     // best_improvement(bit_string);
-    worst_improvement(bit_string);
+  //   worst_improvement(bit_string);
 
-    for (bool element : bit_string) {
-      std::cout << element << " ";
-    }
+  //   for (bool element : bit_string) {
+  //     std::cout << element << " ";
+  //   }
   
-    std::cout << std::endl << std::endl;
-  }
+  //   std::cout << std::endl << std::endl;
+  // }
 
   auto stop = std::chrono::high_resolution_clock::now();
 
