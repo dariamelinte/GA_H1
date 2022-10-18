@@ -1,10 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <random>
-#include <cmath>
-#include <thread>
-
-std::mt19937 random_gen(time(0));
 
 double epsilon = 0.00001;
 
@@ -175,10 +168,9 @@ int main () {
   auto start = std::chrono::high_resolution_clock::now();
   int index = 0;
   srand(time(0));
-  // run_de_jong(10000);
-  // run_schwefels(10000);
-  // run_rastrigins(10000);
-  run_de_jong(8);
+  run_de_jong(10000);
+  run_schwefels(10000);
+  run_rastrigins(10000);
   auto stop = std::chrono::high_resolution_clock::now();
 
   std::chrono::duration<double, std::milli> time = stop - start;
