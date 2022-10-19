@@ -17,6 +17,7 @@ double lowest_double = std::numeric_limits<double>::lowest();
 double highest_double = std::numeric_limits<double>::max();
 
 functions FUNCTION;
+improvement_type IMPROVEMENT;
 
 double LOW;
 double HIGH;
@@ -43,6 +44,20 @@ std::string compute_filename() {
     case functions::michalewiczs:
       filename += "michalewiczs___";
       // TODO: CREATE FUNCTION
+      break;
+    default:
+      break;
+  }
+
+  switch (IMPROVEMENT) {
+    case improvement_type::best:
+      filename += "best-improvement___";
+      break;
+    case improvement_type::first:
+      filename += "first-improvement__";
+      break;
+    case improvement_type::worst:
+      filename += "worst-improvement__";
       break;
     default:
       break;
@@ -322,7 +337,14 @@ function_computation hillclimbing() {
 
     do {
       std::vector<bool> nbh_bit_string = candidate_bit_string;
-      best_improvement(nbh_bit_string);
+
+      if (IMPROVEMENT == improvement_type::best) {
+        best_improvement(nbh_bit_string);
+      } else if (IMPROVEMENT == improvement_type::first) {
+        first_improvement(nbh_bit_string);
+      } else if (IMPROVEMENT == improvement_type::worst) {
+        worst_improvement(nbh_bit_string);
+      }
 
       std::vector<double> nbh_b10_vector = convert_bit_string_to_b10_vector(nbh_bit_string);
 
@@ -362,6 +384,16 @@ int main () {
   std::cout << '\n';
   
   FUNCTION = (functions)(func_num);
+
+  std::cout << "introduceti numarul improvementului pe care vreti sa il folositi" << '\n';
+  std::cout << "1 - best, 2 - first, 3 - worst" << '\n';
+
+  int improvement_num;
+  std::cin >> improvement_num;
+  std::cout << '\n';
+  
+  IMPROVEMENT = (improvement_type)(improvement_num);
+
 
   std::cout << "Introduceti numarul de decimale pe care il va folosi functia pentru precizie: ";
   std::cin >> PRECISION;

@@ -12,6 +12,12 @@ enum functions {
   michalewiczs
 };
 
+enum improvement_type {
+  best = 1,
+  first,
+  worst
+};
+
 struct function_computation {
   double result;
   bool is_ok;
