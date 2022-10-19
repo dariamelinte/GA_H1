@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 struct b10_conversion_info {
   int number;
@@ -21,4 +22,5 @@ enum improvement_type {
 struct function_computation {
   double result;
   bool is_ok;
+  std::vector<double> vect;
 };

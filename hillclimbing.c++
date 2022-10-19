@@ -329,7 +329,8 @@ function_computation hillclimbing() {
     std::vector<double> candidate_b10_vector = convert_bit_string_to_b10_vector(candidate_bit_string);
 
     function_computation candidate_comp = run_given_function(candidate_b10_vector);
-    
+    candidate_comp.vect = candidate_b10_vector;
+
     if (!candidate_comp.is_ok) {
       std::cout << "could not compute candidate function: " << FUNCTION << '\n' << '\n';
       return comp;
@@ -349,6 +350,7 @@ function_computation hillclimbing() {
       std::vector<double> nbh_b10_vector = convert_bit_string_to_b10_vector(nbh_bit_string);
 
       function_computation nbh_comp = run_given_function(nbh_b10_vector);
+      nbh_comp.vect = nbh_b10_vector;
       
       if (!nbh_comp.is_ok) {
         std::cout << "could not compute nbh function: " << FUNCTION << '\n' << '\n';
@@ -357,6 +359,7 @@ function_computation hillclimbing() {
 
       if (nbh_comp.result < candidate_comp.result) {
         candidate_comp.result = nbh_comp.result;
+        candidate_comp.vect = nbh_comp.vect;
         candidate_bit_string = nbh_bit_string;
       } else {
         local = true;
@@ -365,6 +368,7 @@ function_computation hillclimbing() {
 
     if (candidate_comp.result < comp.result) {
       comp.result = candidate_comp.result;
+      comp.vect = candidate_comp.vect;
     }
   }
 
@@ -422,9 +426,16 @@ int main () {
     function_computation comp = hillclimbing();
 
     if (comp.is_ok) {
-      out_file << index << " ----- hillclimber result ------ " << comp.result << '\n' << '\n';
+      out_file << index << " ------  [ ";
+      std::cout << index << " ------  [ ";
 
-      std::cout << index << " ----- hillclimber result ------ " << comp.result << '\n' << '\n';
+      for (double el : comp.vect) {
+        out_file << el << " ";
+        std::cout << el << " ";
+      }
+
+      out_file << " ]  ------ " << comp.result << '\n' << '\n';
+      std::cout << " ]  ------ " << comp.result << '\n' << '\n';
 
       index++;
     }
