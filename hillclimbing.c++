@@ -5,30 +5,64 @@
 #include <thread>
 #include <iomanip>
 #include <limits>
+#include <string>
+#include <fstream>
+#define _USE_MATH_DEFINES
 
 #include "utils.c++"
 
 std::mt19937 random_gen(time(0));
 
-
-// de jong: -5.12; 5.12;  minimum point = 0
-// schwefels: -500; 500;  minimum point = - number_of_dimensions * 418.9829;
-
-
-double low = -500;
-double high = 500;
-double interval = high - low;
-
-
-int precision = 5;
-int number_of_dimensions = 1;
-
-
-int bit_string_len = ceil(log2(pow(10, precision) * interval)); //lungimea unui sir de biti de precizie 'precision'
-int len = number_of_dimensions * bit_string_len; //calculeaza lungimea unui sir de biti pe un anumit numar de dimensiuni 'dimensions'
-
 double lowest_double = std::numeric_limits<double>::lowest();
 double highest_double = std::numeric_limits<double>::max();
+
+functions FUNCTION;
+
+double LOW;
+double HIGH;
+
+int BIT_STRING_LEN;
+int LEN;
+
+int PRECISION;
+int NUMBER_OF_DIMENSIONS;
+
+std::string compute_filename() {
+  std::string filename = "./rapoarte/";
+
+  switch (FUNCTION) {
+    case functions::de_jong:
+      filename += "de_jong___";
+      break;
+    case functions::schwefels:
+      filename += "schwefels___";
+      break;
+    case functions::rastrigins:
+      filename += "rastrigins___";
+      break;
+    case functions::michalewiczs:
+      filename += "michalewiczs___";
+      // TODO: CREATE FUNCTION
+      break;
+    default:
+      break;
+  }
+
+  filename += "precision-";
+  filename += std::to_string(PRECISION);
+  filename += "___";
+
+  filename += "dimensions-";
+  filename += std::to_string(NUMBER_OF_DIMENSIONS);
+  filename += "___";
+
+  int64_t timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
+  filename += std::to_string(timestamp);
+  filename += ".txt";
+
+  return filename;
+}
 
 double de_jong_function (std::vector<double> x) {
   int dimension = x.size();
@@ -48,32 +82,81 @@ double schwefels_function (std::vector<double> x) {
   return f_x;
 }
 
-double generate_random_number(b10_conversion_info info,  double low, double high) {
-  return low + info.number * (high - low) / info.maximum_number;
+double rastrigins_function (std::vector<double> x) {
+  int dimension = x.size();
+  double f_x = 10 * dimension;
+  for (int facet = 0; facet < dimension; facet++) {
+    f_x += x[facet] * x[facet] - 10 * cos(2 * M_PI * x[facet]);
+  }
+  return f_x;
 }
 
-bool generate_random_bit() {
-  return random_gen() % 2;
+function_computation run_given_function(std::vector<double> candidate) {
+  function_computation comp;
+
+  comp.is_ok = false;
+
+  switch (FUNCTION) {
+    case functions::de_jong:
+      comp.result = de_jong_function(candidate);
+      comp.is_ok = true;
+      break;
+    case functions::schwefels:
+      comp.result = schwefels_function(candidate);
+      comp.is_ok = true;
+      break;
+    case functions::rastrigins:
+      comp.result = rastrigins_function(candidate);
+      comp.is_ok = true;
+      break;
+    case functions::michalewiczs:
+      // TODO: CREATE FUNCTION
+      break;
+    default:
+      break;
+  }
+
+  return comp;
 }
 
-std::vector<bool> generate_bit_string(double low, double high) {
+void set_bounds() {
+  switch (FUNCTION) {
+    case functions::de_jong:
+      LOW = -5.12;
+      HIGH = 5.12;
+      break;
+    case functions::schwefels:
+      LOW = -500;
+      HIGH = 500;
+      break;
+    case functions::rastrigins:
+      LOW = -5.12;
+      HIGH = 5.12;
+      break;
+    case functions::michalewiczs:
+      LOW = 0;
+      HIGH = M_PI;
+      break;
+    default:
+      break;
+  }
+}
+
+double generate_random_number(b10_conversion_info info) {
+  return LOW + info.number * (HIGH - LOW) / info.maximum_number;
+}
+
+std::vector<bool> generate_bit_string() {
   std::vector<bool> bit_string;
 
-  for (int index = 0; index < len; index++) {
-    bit_string.push_back(generate_random_bit());
+  for (int index = 0; index < LEN; index++) {
+    bit_string.push_back(random_gen() % 2);
   }
 
   return bit_string;
 }
 
 b10_conversion_info convert_b2_to_b10(std::vector<bool> bit_string) {
-  // std::cout << "mini mini mini bit string: ";
-
-  // for (bool element : bit_string) {
-  //   std::cout << element << " ";
-  // }
-  // std::cout << std::endl << std::endl;
-
   b10_conversion_info info;
 
   long long int power = 1;
@@ -89,8 +172,6 @@ b10_conversion_info convert_b2_to_b10(std::vector<bool> bit_string) {
     power *= 2;
   }
 
-  // std::cout << "info: " << info.number << " " << info.maximum_number << std::endl << std::endl;
-
   return info;
 }
 
@@ -98,24 +179,14 @@ std::vector<double> convert_bit_string_to_b10_vector(std::vector<bool> bit_strin
   std::vector<double> b10_vector;
   std::vector<bool> mini_bit_string;
 
-  // std::cout << std::endl << std::endl << "---------------" << std::endl << std::endl;
-
-  for (int dimension = 0; dimension < number_of_dimensions; dimension++) {
-    for (int bit_i = 0; bit_i < bit_string_len; bit_i++) {
-      int index = bit_i + bit_string_len * dimension;
+  for (int dimension = 0; dimension < NUMBER_OF_DIMENSIONS; dimension++) {
+    for (int bit_i = 0; bit_i < BIT_STRING_LEN; bit_i++) {
+      int index = bit_i + BIT_STRING_LEN * dimension;
       bool bit = bit_string[index];
       mini_bit_string.push_back(bit);
     }
 
-    double number = generate_random_number(convert_b2_to_b10(mini_bit_string), low, high);
-
-    // std::cout << "mini bit string: ";
-
-    // for (bool element : mini_bit_string) {
-    //   std::cout << element << " ";
-    // }
-
-    // std::cout << std::endl << std::endl << number << std::endl << std::endl;
+    double number = generate_random_number(convert_b2_to_b10(mini_bit_string));
 
     b10_vector.push_back(number);
     mini_bit_string.clear();
@@ -127,18 +198,26 @@ std::vector<double> convert_bit_string_to_b10_vector(std::vector<bool> bit_strin
 
 void first_improvement(std::vector<bool>& bit_string) {
   std::vector<double> b10_vector = convert_bit_string_to_b10_vector(bit_string);
-  // double de_jong_result = de_jong_function(b10_vector);
-  double schwefels_result = schwefels_function(b10_vector);
+  function_computation comp = run_given_function(b10_vector);  
 
-  for (int index = 0; index < len; index++) {
+  if (!comp.is_ok) {
+    std::cout << "could not compute function: " << FUNCTION << '\n' << '\n';
+    return;
+  }
+
+  for (int index = 0; index < LEN; index++) {
     bit_string[index] = !bit_string[index];
 
     std::vector<double> new_b10_vector = convert_bit_string_to_b10_vector(bit_string);
-    // double new_de_jong_result = de_jong_function(new_b10_vector);
-    double new_schwefels_result = schwefels_function(new_b10_vector);
+ 
+    function_computation new_comp = run_given_function(new_b10_vector);  
 
-    // if (new_de_jong_result < de_jong_result) {
-    if (new_schwefels_result < schwefels_result) {
+    if (!new_comp.is_ok) {
+      std::cout << "could not compute new function: " << FUNCTION << '\n' << '\n';
+      return;
+    }
+
+    if (new_comp.result < comp.result) {
       return;
     }
 
@@ -149,22 +228,29 @@ void first_improvement(std::vector<bool>& bit_string) {
 
 void best_improvement(std::vector<bool>& bit_string) {
   std::vector<double> b10_vector = convert_bit_string_to_b10_vector(bit_string);
-  // double de_jong_result = de_jong_function(b10_vector);
-  double schwefels_result = schwefels_function(b10_vector);
+  function_computation comp = run_given_function(b10_vector);  
+
+  if (!comp.is_ok) {
+    std::cout << "could not compute function: " << FUNCTION << '\n' << '\n';
+    return;
+  }
 
   int best_index = -1;
 
-  for (int index = 0; index < len; index++) {
+  for (int index = 0; index < LEN; index++) {
     bit_string[index] = !bit_string[index];
 
     std::vector<double> new_b10_vector = convert_bit_string_to_b10_vector(bit_string);
-    // double new_de_jong_result = de_jong_function(new_b10_vector);
-    double new_schwefels_result = schwefels_function(new_b10_vector);
 
-    // if (new_de_jong_result < de_jong_result) {
-    if (new_schwefels_result < schwefels_result) {
-      // de_jong_result = new_de_jong_result;
-      schwefels_result = new_schwefels_result;
+    function_computation new_comp = run_given_function(new_b10_vector);  
+
+    if (!new_comp.is_ok) {
+      std::cout << "could not compute new function: " << FUNCTION << '\n' << '\n';
+      return;
+    }
+
+    if (new_comp.result < comp.result) {
+      comp.result = new_comp.result;
       best_index = index;
     }
 
@@ -178,23 +264,31 @@ void best_improvement(std::vector<bool>& bit_string) {
 
 void worst_improvement(std::vector<bool>& bit_string) {
   std::vector<double> b10_vector = convert_bit_string_to_b10_vector(bit_string);
-  // double de_jong_result = de_jong_function(b10_vector);
-  double schwefels_result = schwefels_function(b10_vector);
+
+  function_computation comp = run_given_function(b10_vector);  
+
+  if (!comp.is_ok) {
+    std::cout << "could not compute function: " << FUNCTION << '\n' << '\n';
+    return;
+  }
 
   double lowest = lowest_double;
   int best_index = -1;
 
-  for (int index = 0; index < len; index++) {
+  for (int index = 0; index < LEN; index++) {
     bit_string[index] = !bit_string[index];
 
     std::vector<double> new_b10_vector = convert_bit_string_to_b10_vector(bit_string);
-    // double new_de_jong_result = de_jong_function(new_b10_vector);
-    double new_schwefels_result = schwefels_function(new_b10_vector);
 
-    // if (new_de_jong_result < de_jong_result && new_de_jong_result > lowest) {
-    if (new_schwefels_result < schwefels_result && new_schwefels_result > lowest) {
-      // lowest = new_de_jong_result;
-      lowest = new_schwefels_result;
+    function_computation new_comp = run_given_function(new_b10_vector);  
+
+    if (!new_comp.is_ok) {
+      std::cout << "could not compute new function: " << FUNCTION << '\n' << '\n';
+      return;
+    }
+
+    if (new_comp.result < comp.result && new_comp.result > lowest) {
+      lowest = new_comp.result;
       best_index = index;
     }
 
@@ -206,88 +300,113 @@ void worst_improvement(std::vector<bool>& bit_string) {
   }
 }
 
-void hillclimbing() {
-  double best_number = highest_double;
+function_computation hillclimbing() {
+  function_computation comp;
 
-  for (int t = 0; t < 1000; t++) {
+  comp.result = highest_double;
+  comp.is_ok = false;
+
+
+  for (int t = 0; t < 1500; t++) {
     bool local = false;
 
-    std::vector<bool> candidate_bit_string = generate_bit_string(low, high);
+    std::vector<bool> candidate_bit_string = generate_bit_string();
     std::vector<double> candidate_b10_vector = convert_bit_string_to_b10_vector(candidate_bit_string);
-    // double candidate_result = de_jong_function(candidate_b10_vector);
-    double candidate_result = schwefels_function(candidate_b10_vector);
+
+    function_computation candidate_comp = run_given_function(candidate_b10_vector);
+    
+    if (!candidate_comp.is_ok) {
+      std::cout << "could not compute candidate function: " << FUNCTION << '\n' << '\n';
+      return comp;
+    }
 
     do {
       std::vector<bool> nbh_bit_string = candidate_bit_string;
       best_improvement(nbh_bit_string);
 
       std::vector<double> nbh_b10_vector = convert_bit_string_to_b10_vector(nbh_bit_string);
-      // double nbh_result = de_jong_function(nbh_b10_vector);
-      double nbh_result = schwefels_function(nbh_b10_vector);
 
-      if (nbh_result < candidate_result) {
-        candidate_result = nbh_result;
+      function_computation nbh_comp = run_given_function(nbh_b10_vector);
+      
+      if (!nbh_comp.is_ok) {
+        std::cout << "could not compute nbh function: " << FUNCTION << '\n' << '\n';
+        return comp;
+      }
+
+      if (nbh_comp.result < candidate_comp.result) {
+        candidate_comp.result = nbh_comp.result;
         candidate_bit_string = nbh_bit_string;
       } else {
         local = true;
       }
     } while (!local);
 
-    if (candidate_result <  best_number) {
-      best_number = candidate_result;
+    if (candidate_comp.result < comp.result) {
+      comp.result = candidate_comp.result;
     }
-
-    std::cout << "current best number ----------------------- " << best_number << std::endl << std::endl;
   }
 
-  std::cout << "hillclimber result ----------------------- " << best_number << std::endl << std::endl;
+  comp.is_ok = true;
+
+  return comp;
 }
 
 int main () {
   srand(time(0));
 
-  std::cout << std::setprecision(precision) << std::fixed;
+  std::cout << "introduceti numarul functiei pe care vreti sa o rulati" << '\n';
+  std::cout << "1 - de jong, 2 - schwefel's, 3 - rastrigins, 4 - michalewiczs" << '\n';
+
+  int func_num;
+  std::cin >> func_num;
+  std::cout << '\n';
+  
+  FUNCTION = (functions)(func_num);
+
+  std::cout << "Introduceti numarul de decimale pe care il va folosi functia pentru precizie: ";
+  std::cin >> PRECISION;
+  std::cout << '\n';
+  
+
+  std::cout << "Introduceti numarul de dimensiuni pe care va fi creata functia: ";
+  std::cin >> NUMBER_OF_DIMENSIONS;
+  std::cout << '\n';
+  
+  std::string output_filename = compute_filename();
 
   auto start = std::chrono::high_resolution_clock::now();
 
-  hillclimbing();
 
-  // for (int i = 0; i < 3; i++) {
-  //   std::cout << i << " ----------- ";
-  //   std::vector<bool> bit_string = generate_bit_string(-5.12, 5.12);
+  std::ofstream out_file(output_filename);
 
-  //   for (bool element : bit_string) {
-  //     std::cout << element << " ";
-  //   }
+  set_bounds();
+  BIT_STRING_LEN = ceil(log2(pow(10, PRECISION) * (HIGH - LOW)));
+  LEN = NUMBER_OF_DIMENSIONS * BIT_STRING_LEN;
 
-  //   std::cout << std::endl << std::endl;
+  out_file << std::setprecision(PRECISION) << std::fixed;
+  std::cout << std::setprecision(PRECISION) << std::fixed;
 
-    // b10_conversion_info info = convert_b2_to_b10(bit_string);
+  for (int index = 1; index <= 30;) {
+    function_computation comp = hillclimbing();
 
-    // std::cout << info.number << " " << info.maximum_number << std::endl << std::endl;
+    if (comp.is_ok) {
+      out_file << index << " ----- hillclimber result ------ " << comp.result << '\n' << '\n';
 
-    // std::vector<double> b10_vector = convert_bit_string_to_b10_vector(bit_string);
+      std::cout << index << " ----- hillclimber result ------ " << comp.result << '\n' << '\n';
 
-
-    // for (double element : b10_vector) {
-    //   std::cout << std::setprecision(precision) << element << " ";
-    // }
-
-    // first_improvement(bit_string);
-    // best_improvement(bit_string);
-  //   worst_improvement(bit_string);
-
-  //   for (bool element : bit_string) {
-  //     std::cout << element << " ";
-  //   }
-  
-  //   std::cout << std::endl << std::endl;
-  // }
+      index++;
+    }
+  }
 
   auto stop = std::chrono::high_resolution_clock::now();
 
   std::chrono::duration<double, std::milli> time = stop - start;
+  out_file << " main ---- difference: " << time.count() / 1000;
   std::cout << " main ---- difference: " << time.count() / 1000;
 
+  out_file << '\n';
   std::cout << std::endl;
+
+  out_file.close();
+  return 0;
 }
