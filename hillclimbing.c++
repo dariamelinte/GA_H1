@@ -425,17 +425,28 @@ int main () {
   for (int index = 1; index <= 30;) {
     function_computation comp = hillclimbing();
 
+    auto start_hill = std::chrono::high_resolution_clock::now();
+
     if (comp.is_ok) {
       out_file << index << " ------  [ ";
       std::cout << index << " ------  [ ";
 
       for (double el : comp.vect) {
         out_file << el << " ";
-        std::cout << el << " ";
+        std::cout << el << " "; 
       }
 
-      out_file << " ]  ------ " << comp.result << '\n' << '\n';
-      std::cout << " ]  ------ " << comp.result << '\n' << '\n';
+      out_file << " ]  ------ result: " << comp.result << " ----- ";
+      std::cout << " ]  ------ result: " << comp.result << " ----- ";
+
+      auto stop_hill = std::chrono::high_resolution_clock::now();
+
+      std::chrono::duration<double, std::milli> time_hill = stop_hill - start_hill;
+      out_file << " time: " << time_hill.count() / 1000;
+      std::cout << " time: " << time_hill.count() / 1000;
+
+      out_file << '\n' << '\n';
+      std::cout << '\n' << '\n';
 
       index++;
     }
@@ -444,8 +455,11 @@ int main () {
   auto stop = std::chrono::high_resolution_clock::now();
 
   std::chrono::duration<double, std::milli> time = stop - start;
-  out_file << " main ---- difference: " << time.count() / 1000;
-  std::cout << " main ---- difference: " << time.count() / 1000;
+  
+  out_file << '\n' << '\n';
+  std::cout << '\n' << '\n';
+  out_file << "total time: " << time.count() / 1000;
+  std::cout << "total time: " << time.count() / 1000;
 
   out_file << '\n';
   std::cout << std::endl;
