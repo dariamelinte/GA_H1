@@ -28,8 +28,7 @@ int LEN;
 int PRECISION;
 int NUMBER_OF_DIMENSIONS;
 
-std::string compute_filename() {
-  std::string filename = "./rapoarte/";
+void compute_filename(std::string& filename) {
 
   switch (FUNCTION) {
     case functions::de_jong:
@@ -69,14 +68,12 @@ std::string compute_filename() {
 
   filename += "dimensions-";
   filename += std::to_string(NUMBER_OF_DIMENSIONS);
-  filename += "___";
+  // filename += "___";
 
-  int64_t timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+  // int64_t timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-  filename += std::to_string(timestamp);
+  // filename += std::to_string(timestamp);
   filename += ".txt";
-
-  return filename;
 }
 
 double de_jong_function (std::vector<double> x) {
@@ -106,11 +103,7 @@ double rastrigins_function (std::vector<double> x) {
   return f_x;
 }
 
-function_computation run_given_function(std::vector<double> candidate) {
-  function_computation comp;
-
-  comp.is_ok = false;
-
+void run_given_function(std::vector<double> candidate, function_computation& comp ) {
   switch (FUNCTION) {
     case functions::de_jong:
       comp.result = de_jong_function(candidate);
@@ -130,8 +123,6 @@ function_computation run_given_function(std::vector<double> candidate) {
     default:
       break;
   }
-
-  return comp;
 }
 
 void set_bounds() {
@@ -161,14 +152,10 @@ double generate_random_number(b10_conversion_info info) {
   return LOW + info.number * (HIGH - LOW) / info.maximum_number;
 }
 
-std::vector<bool> generate_bit_string() {
-  std::vector<bool> bit_string;
-
+void generate_bit_string(std::vector<bool>& bit_string) {
   for (int index = 0; index < LEN; index++) {
     bit_string.push_back(random_gen() % 2);
   }
-
-  return bit_string;
 }
 
 b10_conversion_info convert_b2_to_b10(std::vector<bool> bit_string) {
@@ -179,7 +166,9 @@ b10_conversion_info convert_b2_to_b10(std::vector<bool> bit_string) {
   info.number = 0;
   info.maximum_number = 0;
 
-  for (int index = bit_string.size() - 1; index >= 0; index--) {
+  int size = bit_string.size();
+
+  for (int index = size - 1; index >= 0; index--) {
     int bit = static_cast<int>(bit_string[index]);
 
     info.number += bit * power;
@@ -190,8 +179,7 @@ b10_conversion_info convert_b2_to_b10(std::vector<bool> bit_string) {
   return info;
 }
 
-std::vector<double> convert_bit_string_to_b10_vector(std::vector<bool> bit_string) {
-  std::vector<double> b10_vector;
+void convert_bit_string_to_b10_vector(std::vector<bool> bit_string, std::vector<double>& b10_vector) {
   std::vector<bool> mini_bit_string;
 
   for (int dimension = 0; dimension < NUMBER_OF_DIMENSIONS; dimension++) {
@@ -206,29 +194,34 @@ std::vector<double> convert_bit_string_to_b10_vector(std::vector<bool> bit_strin
     b10_vector.push_back(number);
     mini_bit_string.clear();
   }
-
-  return b10_vector;
 }
 
 
 void first_improvement(std::vector<bool>& bit_string) {
-  std::vector<double> b10_vector = convert_bit_string_to_b10_vector(bit_string);
-  function_computation comp = run_given_function(b10_vector);  
+  std::vector<double> b10_vector;
+  convert_bit_string_to_b10_vector(bit_string, b10_vector);
+  function_computation comp;
+  comp.is_ok = false;
+  run_given_function(b10_vector, comp);  
 
   if (!comp.is_ok) {
-    std::cout << "could not compute function: " << FUNCTION << '\n' << '\n';
+    // std::cout << "could not compute function: " << FUNCTION << '\n' << '\n';
     return;
   }
 
   for (int index = 0; index < LEN; index++) {
     bit_string[index] = !bit_string[index];
 
-    std::vector<double> new_b10_vector = convert_bit_string_to_b10_vector(bit_string);
+    std::vector<double> new_b10_vector;
+    convert_bit_string_to_b10_vector(bit_string, new_b10_vector);
  
-    function_computation new_comp = run_given_function(new_b10_vector);  
+    function_computation new_comp;
+    new_comp.is_ok = false;
+    
+    run_given_function(new_b10_vector, new_comp);  
 
     if (!new_comp.is_ok) {
-      std::cout << "could not compute new function: " << FUNCTION << '\n' << '\n';
+      // std::cout << "could not compute new function: " << FUNCTION << '\n' << '\n';
       return;
     }
 
@@ -242,11 +235,14 @@ void first_improvement(std::vector<bool>& bit_string) {
 
 
 void best_improvement(std::vector<bool>& bit_string) {
-  std::vector<double> b10_vector = convert_bit_string_to_b10_vector(bit_string);
-  function_computation comp = run_given_function(b10_vector);  
+  std::vector<double> b10_vector;
+  convert_bit_string_to_b10_vector(bit_string, b10_vector);
+  function_computation comp;
+  comp.is_ok = false;
+  run_given_function(b10_vector, comp);  
 
   if (!comp.is_ok) {
-    std::cout << "could not compute function: " << FUNCTION << '\n' << '\n';
+    // std::cout << "could not compute function: " << FUNCTION << '\n' << '\n';
     return;
   }
 
@@ -255,12 +251,15 @@ void best_improvement(std::vector<bool>& bit_string) {
   for (int index = 0; index < LEN; index++) {
     bit_string[index] = !bit_string[index];
 
-    std::vector<double> new_b10_vector = convert_bit_string_to_b10_vector(bit_string);
+    std::vector<double> new_b10_vector;
+    convert_bit_string_to_b10_vector(bit_string, new_b10_vector);
 
-    function_computation new_comp = run_given_function(new_b10_vector);  
+    function_computation new_comp;  
+    new_comp.is_ok = false;
+    run_given_function(new_b10_vector, new_comp);  
 
     if (!new_comp.is_ok) {
-      std::cout << "could not compute new function: " << FUNCTION << '\n' << '\n';
+      // std::cout << "could not compute new function: " << FUNCTION << '\n' << '\n';
       return;
     }
 
@@ -278,12 +277,15 @@ void best_improvement(std::vector<bool>& bit_string) {
 }
 
 void worst_improvement(std::vector<bool>& bit_string) {
-  std::vector<double> b10_vector = convert_bit_string_to_b10_vector(bit_string);
+  std::vector<double> b10_vector;
+  convert_bit_string_to_b10_vector(bit_string, b10_vector);
 
-  function_computation comp = run_given_function(b10_vector);  
+  function_computation comp;
+  comp.is_ok = false;
+  run_given_function(b10_vector, comp);  
 
   if (!comp.is_ok) {
-    std::cout << "could not compute function: " << FUNCTION << '\n' << '\n';
+    // std::cout << "could not compute function: " << FUNCTION << '\n' << '\n';
     return;
   }
 
@@ -293,12 +295,15 @@ void worst_improvement(std::vector<bool>& bit_string) {
   for (int index = 0; index < LEN; index++) {
     bit_string[index] = !bit_string[index];
 
-    std::vector<double> new_b10_vector = convert_bit_string_to_b10_vector(bit_string);
+    std::vector<double> new_b10_vector;
+    convert_bit_string_to_b10_vector(bit_string, new_b10_vector);
 
-    function_computation new_comp = run_given_function(new_b10_vector);  
+    function_computation new_comp;
+    new_comp.is_ok = false;
+    run_given_function(new_b10_vector, new_comp);  
 
     if (!new_comp.is_ok) {
-      std::cout << "could not compute new function: " << FUNCTION << '\n' << '\n';
+      // std::cout << "could not compute new function: " << FUNCTION << '\n' << '\n';
       return;
     }
 
@@ -315,25 +320,24 @@ void worst_improvement(std::vector<bool>& bit_string) {
   }
 }
 
-function_computation hillclimbing() {
-  function_computation comp;
-
-  comp.result = highest_double;
-  comp.is_ok = false;
-
-
-  for (int t = 0; t < 1500; t++) {
+void hillclimbing(function_computation& comp) {
+  int maxi_r = IMPROVEMENT == improvement_type::best ? 2500 : 7500;
+  for (int t = 0; t < maxi_r; t++) {
     bool local = false;
 
-    std::vector<bool> candidate_bit_string = generate_bit_string();
-    std::vector<double> candidate_b10_vector = convert_bit_string_to_b10_vector(candidate_bit_string);
+    std::vector<bool> candidate_bit_string;
+    generate_bit_string(candidate_bit_string);
+    std::vector<double> candidate_b10_vector;
+    convert_bit_string_to_b10_vector(candidate_bit_string, candidate_b10_vector);
 
-    function_computation candidate_comp = run_given_function(candidate_b10_vector);
+    function_computation candidate_comp;
+    candidate_comp.is_ok = false;
+    run_given_function(candidate_b10_vector, candidate_comp);
     candidate_comp.vect = candidate_b10_vector;
 
     if (!candidate_comp.is_ok) {
-      std::cout << "could not compute candidate function: " << FUNCTION << '\n' << '\n';
-      return comp;
+      // std::cout << "could not compute candidate function: " << FUNCTION << '\n' << '\n';
+      return;
     }
 
     do {
@@ -347,14 +351,17 @@ function_computation hillclimbing() {
         worst_improvement(nbh_bit_string);
       }
 
-      std::vector<double> nbh_b10_vector = convert_bit_string_to_b10_vector(nbh_bit_string);
+      std::vector<double> nbh_b10_vector;
+      convert_bit_string_to_b10_vector(nbh_bit_string, nbh_b10_vector);
 
-      function_computation nbh_comp = run_given_function(nbh_b10_vector);
+      function_computation nbh_comp;
+      nbh_comp.is_ok = false;
+      run_given_function(nbh_b10_vector, nbh_comp);
       nbh_comp.vect = nbh_b10_vector;
       
       if (!nbh_comp.is_ok) {
-        std::cout << "could not compute nbh function: " << FUNCTION << '\n' << '\n';
-        return comp;
+        // std::cout << "could not compute nbh function: " << FUNCTION << '\n' << '\n';
+        return;
       }
 
       if (nbh_comp.result < candidate_comp.result) {
@@ -373,8 +380,6 @@ function_computation hillclimbing() {
   }
 
   comp.is_ok = true;
-
-  return comp;
 }
 
 int main () {
@@ -408,62 +413,70 @@ int main () {
   std::cin >> NUMBER_OF_DIMENSIONS;
   std::cout << '\n';
   
-  std::string output_filename = compute_filename();
+  std::string output_filename = "./rapoarte/";
+  compute_filename(output_filename);
 
-  auto start = std::chrono::high_resolution_clock::now();
+  // auto start = std::chrono::high_resolution_clock::now();
 
-
-  std::ofstream out_file(output_filename);
 
   set_bounds();
   BIT_STRING_LEN = ceil(log2(pow(10, PRECISION) * (HIGH - LOW)));
   LEN = NUMBER_OF_DIMENSIONS * BIT_STRING_LEN;
-
-  out_file << std::setprecision(PRECISION) << std::fixed;
-  std::cout << std::setprecision(PRECISION) << std::fixed;
+  // std::cout << std::setprecision(PRECISION) << std::fixed;
 
   for (int index = 1; index <= 30;) {
-    function_computation comp = hillclimbing();
-
+    std::ofstream out_file;
+    out_file.open(output_filename, std::ios_base::app);
+  
+    out_file << std::setprecision(PRECISION) << std::fixed;
+  
     auto start_hill = std::chrono::high_resolution_clock::now();
+
+    function_computation comp;
+    comp.result = highest_double;
+    comp.is_ok = false;
+
+    hillclimbing(comp);
 
     if (comp.is_ok) {
       out_file << index << " ------  [ ";
-      std::cout << index << " ------  [ ";
+      // std::cout << index << " ------  [ ";
 
       for (double el : comp.vect) {
         out_file << el << " ";
-        std::cout << el << " "; 
+        // std::cout << el << " "; 
       }
 
       out_file << " ]  ------ result: " << comp.result << " ----- ";
-      std::cout << " ]  ------ result: " << comp.result << " ----- ";
+      // std::cout << " ]  ------ result: " << comp.result << " ----- ";
 
       auto stop_hill = std::chrono::high_resolution_clock::now();
 
       std::chrono::duration<double, std::milli> time_hill = stop_hill - start_hill;
       out_file << " time: " << time_hill.count() / 1000;
-      std::cout << " time: " << time_hill.count() / 1000;
+      // std::cout << " time: " << time_hill.count() / 1000;
 
       out_file << '\n' << '\n';
-      std::cout << '\n' << '\n';
+      // std::cout << '\n' << '\n';
 
       index++;
     }
+
+    out_file.close();
   }
 
-  auto stop = std::chrono::high_resolution_clock::now();
+  // auto stop = std::chrono::high_resolution_clock::now();
 
-  std::chrono::duration<double, std::milli> time = stop - start;
+  // std::chrono::duration<double, std::milli> time = stop - start;
   
-  out_file << '\n' << '\n';
-  std::cout << '\n' << '\n';
-  out_file << "total time: " << time.count() / 1000;
-  std::cout << "total time: " << time.count() / 1000;
+  // out_file << '\n' << '\n';
+  // std::cout << '\n' << '\n';
+  // out_file << "total time: " << time.count() / 1000;
+  // // std::cout << "total time: " << time.count() / 1000;
 
-  out_file << '\n';
-  std::cout << std::endl;
+  // out_file << '\n';
+  // // std::cout << std::endl;
 
-  out_file.close();
+  // out_file.close();
   return 0;
 }

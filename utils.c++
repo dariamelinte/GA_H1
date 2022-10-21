@@ -21,6 +21,6 @@ enum improvement_type {
 
 struct function_computation {
   double result;
-  bool is_ok;
+  bool is_ok = false;
   std::vector<double> vect;
 };
