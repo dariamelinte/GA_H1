@@ -439,13 +439,63 @@ void compile (int max_ind) {
 int main () {
   srand(time(0));
 
+  IMPROVEMENT = improvement_type::worst;
+  NUMBER_OF_DIMENSIONS = 5;
+
+  FUNCTION = functions::rastrigins;
+  compile(4);
+
+
   NUMBER_OF_DIMENSIONS = 10;
 
   // -------------------
   IMPROVEMENT = improvement_type::first;
   // -------------------
   FUNCTION = functions::de_jong;
-  compile(24);
+  compile(20);
+
+  FUNCTION = functions::rastrigins;
+  compile(30);
+
+  FUNCTION = functions::schwefels;
+  compile(30);
+
+
+
+  // -------------------
+  IMPROVEMENT = improvement_type::best;
+  // -------------------
+  FUNCTION = functions::de_jong;
+  compile(30);
+
+  FUNCTION = functions::rastrigins;
+  compile(30);
+
+  FUNCTION = functions::schwefels;
+  compile(30);
+
+
+
+  // -------------------
+  IMPROVEMENT = improvement_type::worst;
+  // -------------------
+  FUNCTION = functions::de_jong;
+  compile(30);
+
+  FUNCTION = functions::rastrigins;
+  compile(30);
+
+  FUNCTION = functions::schwefels;
+  compile(30);
+
+
+  NUMBER_OF_DIMENSIONS = 30;
+
+  // -------------------
+  IMPROVEMENT = improvement_type::first;
+  // -------------------
+  FUNCTION = functions::de_jong;
+  compile(19);
 
   FUNCTION = functions::rastrigins;
   compile(30);
