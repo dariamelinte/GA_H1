@@ -445,6 +445,9 @@ int main () {
   FUNCTION = functions::rastrigins;
   compile(4);
 
+  FUNCTION = functions::schwefels;
+  compile(21);
+
 
   NUMBER_OF_DIMENSIONS = 10;
 
