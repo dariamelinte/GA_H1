@@ -25,7 +25,7 @@ double HIGH;
 int BIT_STRING_LEN;
 int LEN;
 
-int PRECISION;
+int PRECISION = 5;
 int NUMBER_OF_DIMENSIONS;
 
 void compute_filename(std::string& filename) {
@@ -382,37 +382,7 @@ void hillclimbing(function_computation& comp) {
   comp.is_ok = true;
 }
 
-int main () {
-  srand(time(0));
-
-  std::cout << "introduceti numarul functiei pe care vreti sa o rulati" << '\n';
-  std::cout << "1 - de jong, 2 - schwefel's, 3 - rastrigins, 4 - michalewiczs" << '\n';
-
-  int func_num;
-  std::cin >> func_num;
-  std::cout << '\n';
-  
-  FUNCTION = (functions)(func_num);
-
-  std::cout << "introduceti numarul improvementului pe care vreti sa il folositi" << '\n';
-  std::cout << "1 - best, 2 - first, 3 - worst" << '\n';
-
-  int improvement_num;
-  std::cin >> improvement_num;
-  std::cout << '\n';
-  
-  IMPROVEMENT = (improvement_type)(improvement_num);
-
-
-  std::cout << "Introduceti numarul de decimale pe care il va folosi functia pentru precizie: ";
-  std::cin >> PRECISION;
-  std::cout << '\n';
-  
-
-  std::cout << "Introduceti numarul de dimensiuni pe care va fi creata functia: ";
-  std::cin >> NUMBER_OF_DIMENSIONS;
-  std::cout << '\n';
-  
+void compile (int max_ind) {
   std::string output_filename = "./rapoarte/";
   compute_filename(output_filename);
 
@@ -424,7 +394,7 @@ int main () {
   LEN = NUMBER_OF_DIMENSIONS * BIT_STRING_LEN;
   // std::cout << std::setprecision(PRECISION) << std::fixed;
 
-  for (int index = 1; index <= 30;) {
+  for (int index = 1; index <= max_ind;) {
     std::ofstream out_file;
     out_file.open(output_filename, std::ios_base::app);
   
@@ -464,19 +434,52 @@ int main () {
 
     out_file.close();
   }
+}
 
-  // auto stop = std::chrono::high_resolution_clock::now();
+int main () {
+  srand(time(0));
 
-  // std::chrono::duration<double, std::milli> time = stop - start;
-  
-  // out_file << '\n' << '\n';
-  // std::cout << '\n' << '\n';
-  // out_file << "total time: " << time.count() / 1000;
-  // // std::cout << "total time: " << time.count() / 1000;
+  NUMBER_OF_DIMENSIONS = 10;
 
-  // out_file << '\n';
-  // // std::cout << std::endl;
+  // -------------------
+  IMPROVEMENT = improvement_type::first;
+  // -------------------
+  FUNCTION = functions::de_jong;
+  compile(24);
 
-  // out_file.close();
+  FUNCTION = functions::rastrigins;
+  compile(30);
+
+  FUNCTION = functions::schwefels;
+  compile(30);
+
+
+
+  // -------------------
+  IMPROVEMENT = improvement_type::best;
+  // -------------------
+  FUNCTION = functions::de_jong;
+  compile(30);
+
+  FUNCTION = functions::rastrigins;
+  compile(30);
+
+  FUNCTION = functions::schwefels;
+  compile(30);
+
+
+
+  // -------------------
+  IMPROVEMENT = improvement_type::worst;
+  // -------------------
+  FUNCTION = functions::de_jong;
+  compile(30);
+
+  FUNCTION = functions::rastrigins;
+  compile(30);
+
+  FUNCTION = functions::schwefels;
+  compile(30);
+
   return 0;
 }
