@@ -1,0 +1,59 @@
+2 -- solution: 0.00000,, time: 490.76717,
+
+3 -- solution: 0.00000,, time: 495.96634,
+
+4 -- solution: 0.00000,, time: 492.82191,
+
+5 -- solution: 0.00000,, time: 492.79731,
+
+1 -- solution: 0.00000,, time: 476.17366,
+
+2 -- solution: 0.00000,, time: 471.86831,
+
+3 -- solution: 0.00000,, time: 475.34030,
+
+4 -- solution: 0.00000,, time: 471.89286,
+
+5 -- solution: 0.00000,, time: 467.98892,
+
+1 -- solution: 0.00000, time: 113.89950,
+
+2 -- solution: 0.99496, time: 115.22020,
+
+3 -- solution: 0.00000, time: 117.98710,
+
+4 -- solution: 0.00000, time: 119.99726,
+
+5 -- solution: 0.99496, time: 116.57943,
+
+1 -- solution: 0.99496, time: 115.37144,
+
+1 -- solution: 0.00000, time: 114.60597,
+
+2 -- solution: 0.99496, time: 114.69866,
+
+3 -- solution: 0.99496, time: 114.74160,
+
+4 -- solution: 0.99496, time: 114.04091,
+
+5 -- solution: 0.99496, time: 116.09512,
+
+1 -- solution: 0.00000, time: 115.37498,
+
+2 -- solution: 0.99496, time: 114.27351,
+
+3 -- solution: 0.99496, time: 117.92251,
+
+4 -- solution: 0.00000, time: 114.88630,
+
+5 -- solution: 0.00000, time: 117.60818,
+
+1 -- solution: 0.00000, time: 115.77634,
+
+2 -- solution: 0.00000, time: 115.44511,
+
+3 -- solution: 0.99496, time: 115.35348,
+
+4 -- solution: 0.99496, time: 114.03776,
+
+5 -- solution: 0.00000, time: 114.68234,

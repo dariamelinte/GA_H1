@@ -1,0 +1,43 @@
+1 -- solution: 33.24138, time: 1579.26681,
+
+2 -- solution: 39.39051, time: 1638.12706,
+
+1 -- solution: 35.02162, time: 443.02758,
+
+2 -- solution: 36.97529, time: 434.48777,
+
+3 -- solution: 43.26164, time: 432.73430,
+
+4 -- solution: 37.91382, time: 437.62115,
+
+5 -- solution: 38.75463, time: 437.11896,
+
+1 -- solution: 40.49359, time: 1093.74643,
+
+2 -- solution: 39.54375, time: 1077.63886,
+
+3 -- solution: 44.76401, time: 1069.56204,
+
+4 -- solution: 37.61150, time: 1089.17116,
+
+5 -- solution: 42.96995, time: 1089.66170,
+
+1 -- solution: 40.45199, time: 582.80555,
+
+2 -- solution: 39.69789, time: 586.50200,
+
+3 -- solution: 34.45196, time: 578.77433,
+
+4 -- solution: 35.76978, time: 588.58005,
+
+5 -- solution: 40.56517, time: 571.33928,
+
+1 -- solution: 41.84228, time: 587.19566,
+
+2 -- solution: 34.16949, time: 583.92402,
+
+3 -- solution: 40.89333, time: 582.02997,
+
+4 -- solution: 37.62127, time: 600.32720,
+
+5 -- solution: 43.00563, time: 598.23918,

@@ -7,9 +7,32 @@
 #include <limits>
 #include <string>
 #include <fstream>
-#define _USE_MATH_DEFINES
 
-#include "utils.c++"
+#define M_PI 3.14159265358979323846
+
+struct b10_conversion_info {
+  int number;
+  int maximum_number;
+};
+
+enum functions {
+  de_jong = 1,
+  schwefels,
+  rastrigins,
+  michalewiczs
+};
+
+enum improvement_type {
+  best = 1,
+  first,
+  worst
+};
+
+struct function_computation {
+  double result;
+  bool is_ok = false;
+  std::vector<double> vect;
+};
 
 std::mt19937 random_gen(time(0));
 
@@ -42,7 +65,6 @@ void compute_filename(std::string& filename) {
       break;
     case functions::michalewiczs:
       filename += "michalewiczs___";
-      // TODO: CREATE FUNCTION
       break;
     default:
       break;
@@ -62,51 +84,56 @@ void compute_filename(std::string& filename) {
       break;
   }
 
-  filename += "precision-";
-  filename += std::to_string(PRECISION);
-  filename += "___";
-
   filename += "dimensions-";
   filename += std::to_string(NUMBER_OF_DIMENSIONS);
-  // filename += "___";
-
-  // int64_t timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-
-  // filename += std::to_string(timestamp);
   filename += ".txt";
 }
 
-double de_jong_function (std::vector<double> x) {
-  int dimension = x.size();
-  double f_x = 0;
-  for (int facet = 0; facet < dimension; facet++) {
-    f_x += x[facet] * x[facet];
-  }
-  return f_x;
+double de_jongs_function(std::vector<double>& x) {
+    int dimension = x.size();
+    double f_x = 10 * dimension;
+    for (int facet = 0; facet < dimension; facet++) {
+        double num = x[facet];
+        f_x += num * num - 10 * cos(2 * M_PI * num);
+    }
+    return f_x;
 }
 
-double schwefels_function (std::vector<double> x) {
-  int dimension = x.size();
-  double f_x = 0;
-  for (int facet = 0; facet < dimension; facet++) {
-    f_x -= x[facet] * sin(sqrt(abs(x[facet])));
-  }
-  return f_x;
+double rastrigins_function(std::vector<double>& x) {
+    int dimension = x.size();
+    double f_x = 10 * dimension;
+    for (int facet = 0; facet < dimension; facet++) {
+        double num = x[facet];
+        f_x += num * num - 10 * cos(2 * M_PI * num);
+    }
+    return f_x;
 }
 
-double rastrigins_function (std::vector<double> x) {
-  int dimension = x.size();
-  double f_x = 10 * dimension;
-  for (int facet = 0; facet < dimension; facet++) {
-    f_x += x[facet] * x[facet] - 10 * cos(2 * M_PI * x[facet]);
-  }
-  return f_x;
+double schwefels_function(std::vector<double>& x) {
+    int dimension = x.size();
+    double f_x = 0;
+    for (int facet = 0; facet < dimension; facet++) {
+        double num = x[facet];
+        f_x -= num * sin(sqrt(abs(num)));
+    }
+    return f_x;
 }
 
-void run_given_function(std::vector<double> candidate, function_computation& comp ) {
+double michalewiczs_function(std::vector<double>& x) {
+    int dimension = x.size();
+    double f_x = 0;
+    for (int facet = 0; facet < dimension; facet++) {
+        double num = x[facet];
+        f_x -= sin(num) * (double)pow(sin((double)(facet + 1) * num * num / M_PI), 20);
+    }
+
+    return f_x;
+}
+
+void run_given_function(std::vector<double>& candidate, function_computation& comp ) {
   switch (FUNCTION) {
     case functions::de_jong:
-      comp.result = de_jong_function(candidate);
+      comp.result = de_jongs_function(candidate);
       comp.is_ok = true;
       break;
     case functions::schwefels:
@@ -118,7 +145,8 @@ void run_given_function(std::vector<double> candidate, function_computation& com
       comp.is_ok = true;
       break;
     case functions::michalewiczs:
-      // TODO: CREATE FUNCTION
+      comp.result = michalewiczs_function(candidate);
+      comp.is_ok = true;
       break;
     default:
       break;
@@ -148,7 +176,7 @@ void set_bounds() {
   }
 }
 
-double generate_random_number(b10_conversion_info info) {
+double generate_random_number(b10_conversion_info& info) {
   return LOW + info.number * (HIGH - LOW) / info.maximum_number;
 }
 
@@ -158,41 +186,16 @@ void generate_bit_string(std::vector<bool>& bit_string) {
   }
 }
 
-b10_conversion_info convert_b2_to_b10(std::vector<bool> bit_string) {
-  b10_conversion_info info;
-
-  long long int power = 1;
-
-  info.number = 0;
-  info.maximum_number = 0;
-
-  int size = bit_string.size();
-
-  for (int index = size - 1; index >= 0; index--) {
-    int bit = static_cast<int>(bit_string[index]);
-
-    info.number += bit * power;
-    info.maximum_number += power;
-    power *= 2;
-  }
-
-  return info;
-}
-
-void convert_bit_string_to_b10_vector(std::vector<bool> bit_string, std::vector<double>& b10_vector) {
-  std::vector<bool> mini_bit_string;
-
-  for (int dimension = 0; dimension < NUMBER_OF_DIMENSIONS; dimension++) {
-    for (int bit_i = 0; bit_i < BIT_STRING_LEN; bit_i++) {
-      int index = bit_i + BIT_STRING_LEN * dimension;
-      bool bit = bit_string[index];
-      mini_bit_string.push_back(bit);
+void convert_bit_string_to_b10_vector(std::vector<bool>& bit_string, std::vector<double>& b10_vector) {
+  int poz = 0;
+  for (int i = 0; i < LEN; i += BIT_STRING_LEN) {
+    int x_i = 0;
+    for (int j = i; j < i + BIT_STRING_LEN; ++j) {
+      x_i *= 2;
+      x_i += bit_string[j];
     }
-
-    double number = generate_random_number(convert_b2_to_b10(mini_bit_string));
-
-    b10_vector.push_back(number);
-    mini_bit_string.clear();
+    double value = (double)x_i / (pow(2.0, BIT_STRING_LEN) - 1.0);
+    b10_vector.push_back(LOW + value * (HIGH - LOW));
   }
 }
 
@@ -321,8 +324,24 @@ void worst_improvement(std::vector<bool>& bit_string) {
 }
 
 void hillclimbing(function_computation& comp) {
-  int maxi_r = IMPROVEMENT == improvement_type::best ? 2500 : 7500;
+  int maxi_r;
+  if (NUMBER_OF_DIMENSIONS == 5) {
+      // 5 dimensiuni
+      maxi_r = IMPROVEMENT == improvement_type::first ? 7500 : 2500;
+  }
+
+  if (NUMBER_OF_DIMENSIONS == 10) {
+      // 10 dimensiuni
+      maxi_r = IMPROVEMENT == improvement_type::first ? 5000 : 1000;
+  }
+
+  if (NUMBER_OF_DIMENSIONS == 30) {
+      // 30 dimensiuni
+      maxi_r = 300;
+  }
+
   for (int t = 0; t < maxi_r; t++) {
+    std::cout << t << std:: endl;
     bool local = false;
 
     std::vector<bool> candidate_bit_string;
@@ -439,23 +458,60 @@ void compile (int max_ind) {
 int main () {
   srand(time(0));
 
-  IMPROVEMENT = improvement_type::worst;
   NUMBER_OF_DIMENSIONS = 5;
 
+
+  // -------------------
+  IMPROVEMENT = improvement_type::first;
+  // -------------------
+  FUNCTION = functions::de_jong;
+  compile(30);
+
   FUNCTION = functions::rastrigins;
-  compile(4);
+  compile(30);
 
   FUNCTION = functions::schwefels;
-  compile(21);
+  compile(30);
+
+
+
+  // -------------------
+  IMPROVEMENT = improvement_type::best;
+  // -------------------
+  FUNCTION = functions::de_jong;
+  compile(30);
+
+  FUNCTION = functions::rastrigins;
+  compile(30);
+
+  FUNCTION = functions::schwefels;
+  compile(30);
+
+
+
+  // -------------------
+  IMPROVEMENT = improvement_type::worst;
+  // -------------------
+  FUNCTION = functions::de_jong;
+  compile(30);
+
+  FUNCTION = functions::rastrigins;
+  compile(30);
+
+  FUNCTION = functions::schwefels;
+  compile(30);
+
+
 
 
   NUMBER_OF_DIMENSIONS = 10;
 
+
   // -------------------
   IMPROVEMENT = improvement_type::first;
   // -------------------
   FUNCTION = functions::de_jong;
-  compile(20);
+  compile(30);
 
   FUNCTION = functions::rastrigins;
   compile(30);
@@ -490,15 +546,19 @@ int main () {
 
   FUNCTION = functions::schwefels;
   compile(30);
+
+
 
 
   NUMBER_OF_DIMENSIONS = 30;
 
+  
+
   // -------------------
   IMPROVEMENT = improvement_type::first;
   // -------------------
   FUNCTION = functions::de_jong;
-  compile(19);
+  compile(30);
 
   FUNCTION = functions::rastrigins;
   compile(30);
@@ -534,5 +594,7 @@ int main () {
   FUNCTION = functions::schwefels;
   compile(30);
 
+
+  
   return 0;
 }

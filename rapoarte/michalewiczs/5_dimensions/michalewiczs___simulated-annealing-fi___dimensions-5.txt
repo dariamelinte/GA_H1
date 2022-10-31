@@ -1,0 +1,81 @@
+1 -- solution: -4.68766, time: 1499.94429,
+
+1 -- solution: -4.68714, time: 1367.59907,
+
+2 -- solution: -4.68757, time: 1361.55719,
+
+3 -- solution: -4.68692, time: 1367.33370,
+
+4 -- solution: -4.68751, time: 1360.29585,
+
+5 -- solution: -4.68766, time: 1501.26280,
+
+1 -- solution: -4.68706, time: 412.29940,
+
+2 -- solution: -4.68678, time: 412.69913,
+
+3 -- solution: -4.68591, time: 410.41059,
+
+4 -- solution: -4.68625, time: 412.04079,
+
+5 -- solution: -4.68758, time: 411.85241,
+
+1 -- solution: -4.68766, time: 416.69272,
+
+2 -- solution: -4.68763, time: 416.65313,
+
+3 -- solution: -4.68693, time: 417.71256,
+
+4 -- solution: -4.68764, time: 415.80939,
+
+5 -- solution: -4.68752, time: 415.51805,
+
+1 -- solution: -4.68751, time: 550.71829,
+
+2 -- solution: -4.68705, time: 550.52315,
+
+3 -- solution: -4.68765, time: 549.23735,
+
+4 -- solution: -4.68766, time: 578.78010,
+
+5 -- solution: -4.68766, time: 566.90196,
+
+1 -- solution: -4.68752, time: 551.04578,
+
+2 -- solution: -4.68751, time: 553.81185,
+
+3 -- solution: -4.68613, time: 551.65116,
+
+4 -- solution: -4.68691, time: 556.90538,
+
+5 -- solution: -4.68720, time: 550.94538,
+
+1 -- solution: -4.68766, time: 1499.94429,
+
+1 -- solution: -4.68706, time: 412.29940,
+
+2 -- solution: -4.68678, time: 412.69913,
+
+3 -- solution: -4.68591, time: 410.41059,
+
+4 -- solution: -4.68625, time: 412.04079,
+
+5 -- solution: -4.68758, time: 411.85241,
+
+1 -- solution: -4.68766, time: 416.69272,
+
+2 -- solution: -4.68763, time: 416.65313,
+
+3 -- solution: -4.68693, time: 417.71256,
+
+4 -- solution: -4.68764, time: 415.80939,
+
+5 -- solution: -4.68752, time: 415.51805,
+
+1 -- solution: -4.68705, time: 227.43801,
+
+2 -- solution: -4.68765, time: 226.33443,
+
+3 -- solution: -4.68753, time: 225.70690,
+
+4 -- solution: -4.68727, time: 228.97793,

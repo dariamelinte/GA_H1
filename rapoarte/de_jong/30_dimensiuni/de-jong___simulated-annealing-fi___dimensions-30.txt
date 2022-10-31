@@ -1,0 +1,20 @@
+1 -- solution: 39.89364, time: 427.22987,
+
+2 -- solution: 33.01686, time: 435.93475,
+
+3 -- solution: 35.93873, time: 430.56219,
+
+4 -- solution: 44.22246, time: 434.61647,
+
+5 -- solution: 31.51372, time: 435.96301,
+
+1 -- solution: 37.66759, time: 439.10003,
+
+2 -- solution: 36.21110, time: 440.12641,
+
+3 -- solution: 41.60984, time: 435.02100,
+
+4 -- solution: 33.05190, time: 433.96730,
+
+5 -- solution: 34.20604, time: 433.34740,
+

@@ -1,0 +1,57 @@
+1 -- solution: 6.46664 time: 156.05670
+
+2 -- solution: 6.69235 time: 155.88485
+
+3 -- solution: 5.70244 time: 154.35124
+
+4 -- solution: 5.46158 time: 152.99946
+
+5 -- solution: 5.45652 time: 154.21055
+
+1 -- solution: 5.70244 time: 157.06653
+
+2 -- solution: 7.44644 time: 158.27156
+
+3 -- solution: 5.45652 time: 158.12967
+
+4 -- solution: 5.94313 time: 155.44961
+
+5 -- solution: 6.17911 time: 156.68517
+
+1 -- solution: 5.45652 time: 629.17208
+
+2 -- solution: 5.23585 time: 619.65562
+
+3 -- solution: 4.46662 time: 625.73424
+
+4 -- solution: 4.70243 time: 623.61068
+
+5 -- solution: 4.94329 time: 630.32183
+
+1 -- solution: 4.22070 time: 322.61382
+
+2 -- solution: 5.45652 time: 319.19160
+
+3 -- solution: 5.45652 time: 322.34063
+
+4 -- solution: 2.98993 time: 315.91787
+
+5 -- solution: 5.70244 time: 320.81518
+
+1 -- solution: 4.94329 time: 207.49451
+
+2 -- solution: 5.21566 time: 210.69803
+
+3 -- solution: 3.46660 time: 213.46540
+
+4 -- solution: 5.46158 time: 213.64961
+
+5 -- solution: 5.93825 time: 211.24201
+1 -- solution: 4.47167 time: 210.08301
+2 -- solution: 4.39128 time: 197.87213
+
+1 -- solution: 4.70243 time: 264.66196
+
+2 -- solution: 5.70244 time: 258.61122
+
+3 -- solution: 5.46663 time: 256.48177
